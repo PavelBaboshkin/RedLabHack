@@ -1,0 +1,6 @@
+.env
+database/log/**
+database/data/**
+!database/data/.gitkeep
+!database/log/.gitkeep
+interface/env

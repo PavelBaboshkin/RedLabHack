@@ -1,0 +1,33 @@
+version: '3.7'
+
+services:
+  clickhouse:
+    image: yandex/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+      - "9009:9009"
+    volumes:
+      - ./database/data:/var/lib/clickhouse  
+      - ./database/log:/var/log/clickhouse-server 
+      - ./database/entrypoint/init.sql:/docker-entrypoint-initdb.d/init_db.sql
+      - ./database/entrypoint/import_data.sh:/docker-entrypoint-initdb.d/run_initial_script.sh
+      - ./data:/data  
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+  
+  web:
+    build:
+      context: ./interface
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./interface:/app
